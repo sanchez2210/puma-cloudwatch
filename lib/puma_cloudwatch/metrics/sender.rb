@@ -17,6 +17,8 @@ class PumaCloudwatch::Metrics
       @dimension_name = ENV['PUMA_CLOUDWATCH_DIMENSION_NAME'] || "App"
       @dimension_value = ENV['PUMA_CLOUDWATCH_DIMENSION_VALUE'] || "puma"
       @enabled = ENV['PUMA_CLOUDWATCH_ENABLED'] || false
+      @frequency = Integer(ENV['PUMA_CLOUDWATCH_FREQUENCY'] || 60)
+      @storage_resolution = @frequency < 60 ? 1 : 60
     end
 
     def call
@@ -60,7 +62,8 @@ class PumaCloudwatch::Metrics
               sum: values.inject(0) { |sum, el| sum += el },
               minimum: values.min,
               maximum: values.max
-            }
+            },
+            storage_resolution: @storage_resolution
           }
         end
       end
